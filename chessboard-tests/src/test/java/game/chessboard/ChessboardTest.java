@@ -20,7 +20,8 @@ public class ChessboardTest {
 		// given
 		Chessboard chessboard;
 		EnumMap<Coordinate, Field> boardRepresentation;
-		Field expectedField = new Field();
+		Field expectedFieldWhite = new Field(true);
+		Field expectedFieldBlack = new Field(false);
 
 		// when
 		chessboard = new Chessboard();
@@ -29,15 +30,16 @@ public class ChessboardTest {
 		boardRepresentation = chessboard.getChessboardCurrentState();
 		assertThat(boardRepresentation).hasSize(64).containsOnlyKeys(Coordinate.getAllCoordinates());
 		assertThat(boardRepresentation.values()).usingRecursiveFieldByFieldElementComparator()
-				.containsOnly(expectedField);
+				.containsOnlyElementsOf(List.of(expectedFieldWhite, expectedFieldBlack));
 	}
-	
+
 	@Test
 	void should_initializeChessboard_whenGivenFiguresAreEmpty() {
 		// given
 		Chessboard chessboard;
 		EnumMap<Coordinate, Field> boardRepresentation;
-		Field expectedField = new Field();
+		Field expectedFieldWhite = new Field(true);
+		Field expectedFieldBlack = new Field(false);
 
 		// when
 		chessboard = new Chessboard(Collections.emptyList());
@@ -46,7 +48,7 @@ public class ChessboardTest {
 		boardRepresentation = chessboard.getChessboardCurrentState();
 		assertThat(boardRepresentation).hasSize(64).containsOnlyKeys(Coordinate.getAllCoordinates());
 		assertThat(boardRepresentation.values()).usingRecursiveFieldByFieldElementComparator()
-				.containsOnly(expectedField);
+				.containsOnlyElementsOf(List.of(expectedFieldWhite, expectedFieldBlack));
 	}
 
 	@Test
@@ -156,7 +158,7 @@ public class ChessboardTest {
 		// then
 		boardRepresentation = chessboard.getChessboardCurrentState();
 		assertThat(firstFigure.getCurrentPosition()).isEqualTo(secondFigurePosition);
-		assertThat(secondFigure.getCurrentPosition()).isNull(); // indicates that this figure was taken - has no currentposition assigned
+		assertThat(secondFigure.getCurrentPosition()).isNull(); // indicates that this figure was taken - has no current position assigned
 		assertThat(boardRepresentation.get(firstFigurePosition).getFigure()).isNull();
 		assertThat(boardRepresentation.get(secondFigurePosition).getFigure()).usingRecursiveComparison()
 				.isEqualTo(firstFigure);
@@ -178,17 +180,17 @@ public class ChessboardTest {
 		assertThat(boardRepresentation.get(Coordinate.D5).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.E5).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.F5).getFieldValue()).isEqualTo(1);
-		
+
 		assertThat(boardRepresentation.get(Coordinate.D4).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.E4).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.F4).getFieldValue()).isEqualTo(1);
-		
+
 		assertThat(boardRepresentation.get(Coordinate.D3).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.E3).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.F3).getFieldValue()).isEqualTo(1);
-		
+
 	}
-	
+
 	@Test
 	void should_updateFieldStatesCorrectly_whenOneFigureInitialized_inTheCorner() {
 		// given
@@ -206,7 +208,7 @@ public class ChessboardTest {
 		assertThat(boardRepresentation.get(Coordinate.B1).getFieldValue()).isEqualTo(1);
 		assertThat(boardRepresentation.get(Coordinate.B2).getFieldValue()).isEqualTo(1);
 	}
-	
+
 	@Test
 	void should_updateFieldStatesCorrectly_whenMultipleFiguresCrossRoads() {
 		// given

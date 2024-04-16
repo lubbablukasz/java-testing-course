@@ -1,19 +1,12 @@
 package game;
 
-import java.util.List;
-
-import game.chessboard.Chessboard;
-import game.figures.Figure;
+import game.ui.manager.GuiManager;
 
 public class GameEngine {
-	
-	private final Chessboard chessboard;
-	private final List<Figure> figures;
-	
-	public GameEngine(List<Figure> figures) {
-		this.chessboard = new Chessboard();
-		this.figures = figures;
+
+	public static void main(String[] args) {
+		GuiManager manager = new GuiManager();
+		manager.runGui();
 	}
-	
-	
+
 }

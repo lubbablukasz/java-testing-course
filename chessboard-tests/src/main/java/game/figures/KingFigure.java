@@ -6,15 +6,11 @@ import game.coordinates.Coordinate;
 
 public class KingFigure implements Figure {
 
-	private static final Coordinate DEFAULT_STARTING_POSITION = Coordinate.E1;
-
+	private static final String FIGURE_SYMBOL = "K";
+	
 	private final Coordinate startingPosition;
 
 	private Coordinate currentPosition;
-
-	public KingFigure() {
-		this(DEFAULT_STARTING_POSITION);
-	}
 
 	public KingFigure(Coordinate startingPosition) {
 		this.startingPosition = startingPosition;
@@ -47,5 +43,10 @@ public class KingFigure implements Figure {
 	@Override
 	public void setCurrentPosition(Coordinate coordinate) {
 		this.currentPosition = coordinate;
+	}
+
+	@Override
+	public String getFigureSymbol() {
+		return FIGURE_SYMBOL;
 	}
 }

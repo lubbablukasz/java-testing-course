@@ -35,6 +35,10 @@ public enum Coordinate {
 		return ordinal() / 8 + 1;
 	}
 
+	public static boolean isValidCoordinate(int dx, int dy) {
+		return dx >= 1 && dx <= 8 && dy >= 1 && dy <= 8;
+	}
+	
 	public static boolean isValidCoordinate(Coordinate coordinate) {
 		int x = coordinate.getX();
 		int y = coordinate.getY();
@@ -53,5 +57,9 @@ public enum Coordinate {
 
 	public static List<Coordinate> getAllCoordinates() {
 		return List.of(Coordinate.values());
+	}
+
+	public static Coordinate fromXY(int dx, int dy) {
+		return Coordinate.values()[(dy - 1) * 8 + (dx - 1)];
 	}
 }

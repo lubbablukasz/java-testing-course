@@ -10,14 +10,17 @@ public class Field implements Serializable {
 
 	private Figure figure;
 	private int fieldState;
+	private final boolean isWhite;
 
-	public Field() {
-		this(null);
+	public Field(boolean isWhite) {
+		this.setFieldNotActive();
+		this.isWhite = isWhite;
 	}
-
-	public Field(Figure figure) {
+	
+	public Field(Figure figure, boolean isWhite) {
 		this.setFigure(figure);
 		this.setFieldNotActive();
+		this.isWhite = isWhite;
 	}
 
 	public Figure getFigure() {
@@ -38,5 +41,9 @@ public class Field implements Serializable {
 
 	public void incrementFieldState() {
 		fieldState++;
+	}
+
+	public boolean isWhite() {
+		return isWhite;
 	}
 }

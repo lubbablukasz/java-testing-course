@@ -9,6 +9,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import game.chessboard.exception.InitializationException;
 import game.coordinates.Coordinate;
 import game.figures.Figure;
+import game.figures.KingFigure;
 
 public class Chessboard {
 
@@ -19,7 +20,7 @@ public class Chessboard {
 	}
 
 	public Chessboard(List<Figure> figures) {
-		initializeChessboard();
+		this();
 		setFiguresOnChessboard(figures);
 	}
 
@@ -33,12 +34,13 @@ public class Chessboard {
 
 	public void setFiguresOnChessboard(List<Figure> figures) {
 		figures.forEach(figure -> {
-			Coordinate coordinate = figure.getStartingPosition();
+			Coordinate coordinate = figure.getCurrentPosition();
 			if (board.containsKey(coordinate)) {
-				if(Objects.nonNull(getFigureFromField(coordinate))) {
-					throw new InitializationException("Cannot initialize chessboard, multiple figures were set for the same field");
+				if (Objects.nonNull(getFigureFromField(coordinate))) {
+					throw new InitializationException(
+							"Cannot initialize chessboard, multiple figures were set for the same field");
 				}
-				board.get(coordinate).setFigure(figure);
+				setFigureToField(figure, coordinate);
 			}
 		});
 	}
@@ -55,7 +57,6 @@ public class Chessboard {
 		if (isValidMove(from, to)) {
 			takeFigureIfPossible(to);
 			Figure chosenFigure = getAndDeleteFigureFromField(from);
-			chosenFigure.setCurrentPosition(to);
 			setFigureToField(chosenFigure, to);
 		}
 	}
@@ -63,7 +64,8 @@ public class Chessboard {
 	private void initializeChessboard() {
 		if (board.isEmpty()) {
 			Coordinate.getAllCoordinates().forEach(coordinate -> {
-				board.put(coordinate, new Field());
+				boolean isWhite = (coordinate.getX() + coordinate.getY()) % 2 == 0;
+				board.put(coordinate, new Field(isWhite));
 			});
 		}
 	}
@@ -107,19 +109,29 @@ public class Chessboard {
 		return getChosenField(coordinate).getFigure();
 	}
 
-	private void takeFigureIfPossible(Coordinate coordinate) {
+	public void takeFigureIfPossible(Coordinate coordinate) {
 		if (!isChosenFieldEmpty(coordinate)) {
 			getFigureFromField(coordinate).setCurrentPosition(null);
+			getAndDeleteFigureFromField(coordinate);
 		}
 	}
 
+	public void putKingFigureOnField(Coordinate coordinate) {
+		setFigureToField(new KingFigure(coordinate), coordinate);
+	}
+	
 	private void setFigureToField(Figure figure, Coordinate coordinate) {
+		figure.setCurrentPosition(coordinate);
 		getChosenField(coordinate).setFigure(figure);
+	}
+
+	private void clearField(Coordinate coordinate) {
+		getChosenField(coordinate).setFigure(null);
 	}
 
 	private Figure getAndDeleteFigureFromField(Coordinate coordinate) {
 		Figure figure = getFigureFromField(coordinate);
-		setFigureToField(null, coordinate);
+		clearField(coordinate);
 		return figure;
 	}
 }
