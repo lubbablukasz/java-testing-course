@@ -1,15 +1,19 @@
 package selenium.test.base;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import selenium.test.driver.PageLoadCondition;
@@ -19,8 +23,6 @@ public abstract class AbstractTestBase {
 
 	private static final Duration WAIT_TIME = Duration.ofSeconds(10);
 
-	private WebDriverWait wait;
-	private PageLoadCondition pageLoadCondition = new PageLoadCondition();
 	private static WebDriver driver;
 
 	/**
@@ -33,15 +35,23 @@ public abstract class AbstractTestBase {
 		driver = WebDriverManager.getNewDriver();
 	}
 
+	@AfterAll
+	static void tearDown() {
+		WebDriverManager.tearDownDriver(driver);
+	}
+
 	@BeforeEach
-	void start() {
+	protected void start() {
 		loadPage(getUrl());
 		waitForPage();
 	}
 
-	@AfterAll
-	static void tearDown() {
-		WebDriverManager.tearDownDriver(driver);
+	protected String getTitle() {
+		return driver.getTitle();
+	}
+
+	protected String getCurrentUrl() {
+		return driver.getCurrentUrl();
 	}
 
 	protected WebElement findElement(By by) {
@@ -53,13 +63,50 @@ public abstract class AbstractTestBase {
 	}
 
 	protected void loadPage(String url) {
-		if (Objects.nonNull(driver)) {
-			driver.get(url);
+		driver.get(url);
+	}
+
+	protected void scrollToElement(WebElement element) {
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+	}
+
+	protected void forceClickElement(WebElement element) {
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+	}
+
+	/**
+	 * Użycie metody tylko w ostateczności (tzn najbardziej problemowym przypadku,
+	 * gdzie elementów nie można namierzyć bez odczekania chwili)
+	 */
+	protected void waitForRequestedTimeInMilliseconds(long milliseconds) {
+		try {
+			Thread.sleep(milliseconds);
+		} catch (InterruptedException e) {
+			throw new RuntimeException();
 		}
 	}
 
 	protected void waitForPage() {
-		wait = new WebDriverWait(driver, WAIT_TIME);
-		wait.until(pageLoadCondition);
+		getWait().until(new PageLoadCondition());
+	}
+
+	protected void waitForElementToBeClickable(By by) {
+		getWait().until(ExpectedConditions.elementToBeClickable(by));
+	}
+
+	protected void waitForElementToBeVisible(By by) {
+		getWait().until(ExpectedConditions.visibilityOfElementLocated(by));
+	}
+
+	protected void waitForElementToHaveClass(By by, String className) {
+		getWait().until(ExpectedConditions.attributeContains(by, "class", className));
+	}
+
+	protected void assertElementIsNotPresent(By by) {
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> findElement(by));
+	}
+
+	private WebDriverWait getWait() {
+		return new WebDriverWait(driver, WAIT_TIME);
 	}
 }
